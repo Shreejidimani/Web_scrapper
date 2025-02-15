@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="text-light">Welcome, {{ session["username"] }}!</h2>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline-light">Logout</a>
+    </div>
+    <p class="text-muted">Enter a website URL and select the type of data you want to scrape.</p>
+
+    <!-- Scraping Form -->
+    <div class="card shadow-lg p-4 mt-4" style="border-radius: 10px;">
+        <form method="POST" action="{{ url_for('scrape') }}">
+            <div class="mb-3">
+                <label class="form-label">Website URL</label>
+                <input type="url" class="form-control" name="url" placeholder="Enter website URL" required>
+            </div>
+        
+            <div class="mb-3">
+                <label class="form-label">Select Data Type</label>
+                <select class="form-select" id="dataType" name="data_type" required onchange="toggleCustomInput()">
+                    <option value="headlines">Headlines</option>
+                    <option value="product_details">Product Details</option>
+                    <option value="job_listings">Job Listings</option>
+                    <option value="full_text">Full Page Text</option>
+                    <option value="custom">Custom Data (Enter HTML Tag, Class, or ID)</option>
+                </select>
+            </div>
+        
+            <!-- Custom Data Fields -->
+            <div class="mb-3" id="customDataInput" style="display: none;">
+                <label class="form-label">HTML Tag</label>
+                <input type="text" class="form-control" name="tag" placeholder="e.g., div, span, p">
+        
+                <label class="form-label">Attribute (Optional)</label>
+                <input type="text" class="form-control" name="attribute" placeholder="e.g., class, id">
+        
+                <label class="form-label">Value (Optional)</label>
+                <input type="text" class="form-control" name="value" placeholder="e.g., product-title">
+            </div>
+        
+            <div class="mb-3">
+                <label class="form-label">Number of Pages (Optional)</label>
+                <input type="number" class="form-control" name="pages" placeholder="Enter number of pages to scrape">
+            </div>
+        
+            <button type="submit" class="btn btn-primary w-100">Start Scraping</button>
+        </form>
+    </div>
+    
+    <script>
+    function toggleCustomInput() {
+        var dataType = document.getElementById("dataType").value;
+        var customInput = document.getElementById("customDataInput");
+        customInput.style.display = (dataType === "custom") ? "block" : "none";
+    }
+    </script>
+
+    <hr>
+
+    <!-- Scraping Results -->
+    {% if scraped_data %}
+    <div class="card shadow-lg p-4 mt-4" style="border-radius: 10px;">
+        <h2 class="text-light">Scraped Data</h2>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        {% for key in scraped_data[0].keys() %}
+                            <th>{{ key }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in scraped_data %}
+                        <tr>
+                            {% for value in item.values() %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Download CSV Button -->
+        {% if csv_filename %}
+            <a href="{{ url_for('static', filename=csv_filename) }}" download class="btn btn-success mt-3">Download CSV</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <hr>
+
+    <!-- Scraping History -->
+    <div class="card shadow-lg p-4 mt-4" style="border-radius: 10px; background-color: #f8f9fa;"> <!-- Match the scraping form color -->
+        <div class="d-flex justify-content-between align-items-center">
+             <h3 class="text-dark">Scraping History</h3>
+            <form action="{{ url_for('clear_history') }}" method="POST" onsubmit="return confirm('Are you sure you want to clear history?');">
+                <button type="submit" class="btn btn-outline-dark">Clear Scraping History</button>
+            </form>
+        </div>
+
+        {% if history %}
+        <div class="table-responsive mt-3">
+            <table class="table table-striped table-bordered">
+                <thead class="custom-header">
+
+                    <tr>
+                        <th class="text-dark">URL</th>
+                        <th class="text-dark">Data Type</th>
+                        <th class="text-dark">Scraped On</th>
+                        <th class="text-dark">Download</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in history %}
+                    <tr>
+                        <td><a href="{{ entry.url }}" target="_blank" class="text-dark">{{ entry.url }}</a></td>
+                        <td class="text-dark">{{ entry.data_type }}</td>
+                        <td class="text-dark">{{ entry.date_scraped.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>
+                            {% if entry.filename %}
+                                <a href="{{ url_for('download', file_id=entry.id) }}" class="btn btn-success btn-sm">Download CSV</a>
+                            {% else %}
+                                <span class="text-danger">No file available</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted">No scraping history found.</p>
+        {% endif %}
+    </div>
+    <div style="height: 50px;"></div>
+
+</div>
+
+<!-- Add some CSS for background and card styling -->
+<style>
+    body {
+        background: linear-gradient(to right, #4e54c8, #8f94fb); /* Gradient background */
+    }
+    .card {
+        background: white; /* White background for the card */
+        border: none; /* Remove border */
+        border-radius: 10px; /* Rounded corners */
+    }
+    .btn-primary {
+        background-color: #007bff; /* Primary button color */
+        border-color: #007bff; /* Border color */
+    }
+    .btn-success {
+        background-color: #28a745; /* Success button color */
+        border-color: #28a745; /* Border color */
+    }
+    .text-light {
+        color: #f8f9fa; /* Light text color for better visibility */
+    }
+    .text-dark {
+        color: #343a40; /* Dark text color for better visibility */
+    }
+    .custom-header th {
+        background-color: #007bff !important; /* Dark Blue */
+        color: white !important; /* White Text */
+    }
+    
+
+
+    
+</style>
+{% endblock %}
