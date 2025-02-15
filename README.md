@@ -67,6 +67,6 @@ This project is open-source under the **MIT License**.
 Feel free to fork this repository and submit pull requests!
 
 ---
-**Author:** Your Name  
-**GitHub:** [YourUsername](https://github.com/yourusername)
+**Author:** Bhagyashree Jidimani  
+**GitHub:** [Shreejidimani][(https://github.com/yourusername)](https://github.com/Shreejidimani)
 
