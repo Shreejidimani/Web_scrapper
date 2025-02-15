@@ -70,3 +70,12 @@ Feel free to fork this repository and submit pull requests!
 **Author:** Bhagyashree Jidimani  
 **GitHub:** [Shreejidimani][(https://github.com/yourusername)](https://github.com/Shreejidimani)
 
+# Web Scraper with Flask
+
+![License](https://img.shields.io/github/license/yourusername/web-scraper)
+![Python](https://img.shields.io/badge/Python-3.x-blue)
+![Flask](https://img.shields.io/badge/Flask-2.1.2-green)
+![Last Commit](https://img.shields.io/github/last-commit/yourusername/web-scraper)
+![Open Issues](https://img.shields.io/github/issues/yourusername/web-scraper)
+![Forks](https://img.shields.io/github/forks/yourusername/web-scraper?style=social)
+![Stars](https://img.shields.io/github/stars/yourusername/web-scraper?style=social)
